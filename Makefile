@@ -7,7 +7,10 @@ mir/mir.c:
 utest:
 	git clone https://github.com/sheredom/utest.h $@
 
-main: $(LIBMIR) utest
+.DEFAULT_GOAL :=
+all: main
+
+main: $(LIBMIR) utest jit-mir.cc main.cc
 	g++ -o $@ \
 		-I./mir -I. \
 		jit-mir.cc \
