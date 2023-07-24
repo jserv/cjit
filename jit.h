@@ -2,13 +2,15 @@
 
 #include <string>
 
-namespace cjit {
+namespace cjit
+{
 struct CompiledInfo {
     long *id;
     void *binary;
 };
 
-class JitCompiler {
+class JitCompiler
+{
 public:
     virtual ~JitCompiler() {}
 

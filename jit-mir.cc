@@ -8,10 +8,12 @@ extern "C" {
 #include <string.h>
 #include <vector>
 
-namespace cjit {
+namespace cjit
+{
 using std::string;
 
-class StrBuf {
+class StrBuf
+{
     string str;
     int len, pos = 0;
 
@@ -20,33 +22,39 @@ public:
     int getc() { return pos >= len ? EOF : str[pos++]; }
 };
 
-static int cjit_getc(void *data) {
+static int cjit_getc(void *data)
+{
     return static_cast<StrBuf *>(data)->getc();
 }
 
-class MirCompiler : public JitCompiler {
+class MirCompiler : public JitCompiler
+{
     MIR_context_t ctx_;
     c2mir_options c2m_opt_;
 
     void initCompilerOptions() { memset(&c2m_opt_, 0, sizeof(c2m_opt_)); }
 
 public:
-    MirCompiler() {
+    MirCompiler()
+    {
         ctx_ = MIR_init();
         initCompilerOptions();
         MIR_gen_init(ctx_, 1);  // gens_num=1
     }
 
-    ~MirCompiler() {
+    ~MirCompiler()
+    {
         MIR_gen_finish(ctx_);
         MIR_finish(ctx_);
     }
 
-    void importSymbol(const std::string &name, void *p) override {
+    void importSymbol(const std::string &name, void *p) override
+    {
         MIR_load_external(ctx_, name.c_str(), p);
     }
 
-    CompiledInfo compile(const std::string &c_code) override {
+    CompiledInfo compile(const std::string &c_code) override
+    {
         StrBuf buf(c_code);
 
         c2mir_init(ctx_);
@@ -71,7 +79,8 @@ public:
 };
 
 template <>
-JitCompiler *create<MirCompiler>() {
+JitCompiler *create<MirCompiler>()
+{
     return new MirCompiler();
 }
 
