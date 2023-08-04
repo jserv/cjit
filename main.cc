@@ -57,7 +57,7 @@ UTEST_F(JitC, call_ext)
             return n; \
         } \n";
 
-    // NOTE: we need to add declearation of is_prime in c_code to make it work
+    // NOTE: we need to add declaration of is_prime in c_code to make it work
     // (for MIR?)
     compiler->importSymbol("is_prime", (void *) ext_is_prime);
     cjit::CompiledInfo info = compiler->compile(c_code);
@@ -78,7 +78,7 @@ UTEST_F(JitC, simple_micro)
             return POW(a) + POW(b); \
         }\n";
 
-    // NOTE: newline after macro defination is needed.
+    // NOTE: newline after macro definition is needed.
     cjit::CompiledInfo info = compiler->compile(c_code);
 
     typedef int (*fun_p)(int, int);
