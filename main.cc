@@ -48,14 +48,14 @@ UTEST_F(JitC, call_ext)
     auto *compiler = JITC;
     const char *c_code =
         " \
-	extern int is_prime(int); \
-        int count_prime(int max) { \
-            int n = 0; \
-            for (int i = 3; i < max; i++) \
-                if (is_prime(i)) \
-                    n++; \
-            return n; \
-        } \n";
+extern int is_prime(int); \
+int count_prime(int max) { \
+    int n = 0; \
+    for (int i = 3; i < max; i++) \
+        if (is_prime(i)) \
+    n++; \
+    return n; \
+} \n";
 
     // NOTE: we need to add declaration of is_prime in c_code to make it work
     // (for MIR?)
@@ -73,10 +73,10 @@ UTEST_F(JitC, simple_micro)
     auto *compiler = JITC;
     const char *c_code =
         " \
-        #define POW(x) ((x) * (x)) \n\
-        int func_add(int a, int b) { \
-            return POW(a) + POW(b); \
-        }\n";
+#define POW(x) ((x) * (x)) \n\
+int func_add(int a, int b) { \
+    return POW(a) + POW(b); \
+}\n";
 
     // NOTE: newline after macro definition is needed.
     cjit::CompiledInfo info = compiler->compile(c_code);
@@ -133,27 +133,27 @@ UTEST_F(JitC, mandelbrot_mir)
 {
     auto *compiler = JITC;
     const char *c_code =
-        "           \
-        int mandelbrot(double x, double y) \
-        { \
-            double cr = y - 0.5; \
-            double ci = x; \
-            double zi = 0.0; \
-            double zr = 0.0; \
-            int i = 0; \
-            while (1) { \
-                i++; \
-                double temp = zr * zi; \
-                double zr2 = zr * zr; \
-                double zi2 = zi * zi; \
-                zr = zr2 - zi2 + cr; \
-                zi = temp + temp + ci; \
-                if (zi2 + zr2 > 16) \
-                    return i; \
-                if (i > 1000) \
-                    return 0; \
-            } \
-        }\n";
+        " \
+int mandelbrot(double x, double y) \
+{ \
+    double cr = y - 0.5; \
+    double ci = x; \
+    double zi = 0.0; \
+    double zr = 0.0; \
+    int i = 0; \
+    while (1) { \
+        i++; \
+        double temp = zr * zi; \
+        double zr2 = zr * zr; \
+        double zi2 = zi * zi; \
+        zr = zr2 - zi2 + cr; \
+        zi = temp + temp + ci; \
+        if (zi2 + zr2 > 16) \
+            return i; \
+        if (i > 1000) \
+            return 0; \
+    } \
+}\n";
 
     cjit::CompiledInfo info = compiler->compile(c_code);
 
@@ -166,20 +166,20 @@ UTEST_F(JitC, mandelbrot_mir)
 
 static void gen_mandelbrot(ir_ctx *ctx)
 {
-    ir_START();
     /* clang-format off */
+    ir_START();
     ir_ref x = ir_PARAM(IR_DOUBLE, "x", 1);
     ir_ref y = ir_PARAM(IR_DOUBLE, "y", 2);
     ir_ref cr = ir_SUB_D(y, ir_CONST_DOUBLE(0.5));
     ir_ref ci = ir_COPY_D(x);
     ir_ref zi = ir_COPY_D(ir_CONST_DOUBLE(0.0));
     ir_ref zr = ir_COPY_D(ir_CONST_DOUBLE(0.0));
-    ir_ref i = ir_COPY_D(ir_CONST_I32(0));
+    ir_ref i = ir_COPY_I32(ir_CONST_I32(0));
 
     ir_ref loop = ir_LOOP_BEGIN(ir_END());
-        ir_ref zi_1 = ir_PHI_2(zi, IR_UNUSED);
-        ir_ref zr_1 = ir_PHI_2(zr, IR_UNUSED);
-        ir_ref i_1 = ir_PHI_2(i, IR_UNUSED);
+        ir_ref zi_1 = ir_PHI_2(IR_DOUBLE, zi, IR_UNUSED);
+        ir_ref zr_1 = ir_PHI_2(IR_DOUBLE, zr, IR_UNUSED);
+        ir_ref i_1 = ir_PHI_2(IR_I32, i, IR_UNUSED);
 
         ir_ref i_2 = ir_ADD_I32(i_1, ir_CONST_I32(1));
         ir_ref temp = ir_MUL_D(zr_1, zi_1);

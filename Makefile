@@ -42,4 +42,4 @@ clean:
 	rm -f main
 
 distclean: clean
-	rm -rf mir utest
+	rm -rf mir ir utest
